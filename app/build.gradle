@@ -6,12 +6,12 @@ plugins {
 
 android {
     namespace 'ru.tinkoff.favouritepersons'
-    compileSdk 33
+    compileSdk 36
 
     defaultConfig {
         applicationId "ru.tinkoff.favouritepersons"
         minSdk 27
-        targetSdk 33
+        targetSdk 36
         versionCode 1
         versionName "1.0"
 
@@ -30,6 +30,18 @@ android {
     }
     kotlinOptions {
         jvmTarget = '17'
+        freeCompilerArgs += ['-Xjdk-release=17']
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.8"
+    }
+    testOptions {
+        execution 'ANDROIDX_TEST_ORCHESTRATOR'
+        animationsDisabled = true
+
+        unitTests {
+            includeAndroidResources = true
+        }
     }
 }
 
@@ -45,6 +57,7 @@ dependencies {
     implementation "com.squareup.okhttp3:okhttp:4.10.0"
     implementation "com.squareup.okhttp3:logging-interceptor:4.10.0"
     implementation "com.squareup.retrofit2:converter-gson:2.9.0"
+    implementation 'org.apache.httpcomponents:httpclient-android:4.3.5.1'
 
     //Coroutine
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4"
@@ -66,4 +79,26 @@ dependencies {
     implementation 'androidx.databinding:baseLibrary:3.2.0-alpha11'
     kapt 'androidx.room:room-compiler:2.5.1'
 
+    // Compose
+    implementation(platform("androidx.compose:compose-bom:2023.10.01"))
+    implementation("androidx.compose.ui:ui")
+    implementation("androidx.compose.ui:ui-graphics")
+    implementation("androidx.compose.ui:ui-tooling-preview")
+    implementation("androidx.compose.material3:material3")
+
+    // Activity Compose
+    implementation("androidx.activity:activity-compose:1.8.2")
+
+    // Navigation Compose
+    implementation("androidx.navigation:navigation-compose:2.7.6")
+
+    // Test
+    androidTestImplementation("com.kaspersky.android-components:kaspresso:1.5.8")
+    androidTestImplementation("com.kaspersky.android-components:kaspresso-junit:1.5.8")
+    androidTestImplementation("com.github.tomakehurst:wiremock:2.27.2") {
+        exclude group: 'org.apache.httpcomponents', module: 'httpclient'
+    }
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
+    debugImplementation("androidx.compose.ui:ui-tooling")
+    debugImplementation("androidx.compose.ui:ui-test-manifest")
 }
