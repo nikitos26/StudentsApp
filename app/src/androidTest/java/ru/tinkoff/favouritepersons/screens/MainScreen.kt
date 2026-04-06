@@ -8,9 +8,11 @@ import io.github.kakaocup.kakao.common.views.KView
 import io.github.kakaocup.kakao.recycler.KRecyclerView
 import io.github.kakaocup.kakao.text.KButton
 import io.github.kakaocup.kakao.text.KTextView
+import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
 import ru.tinkoff.favouritepersons.R
 import ru.tinkoff.favouritepersons.helpers.ListOfPerson
+import com.google.android.material.R as SnackbarR
 
 /**
  * @author n.miroshkin
@@ -28,6 +30,7 @@ class MainScreen(testContext: TestContext<*>) : BaseScreen(testContext) {
         }
     )
     private val sortBtn = KButton { withId(R.id.action_item_sort) }
+    private val snackar = KTextView { withId(SnackbarR.id.snackbar_text) }
 
     fun clickPersonBtn() {
         addPersonBtn.click()
@@ -72,6 +75,52 @@ class MainScreen(testContext: TestContext<*>) : BaseScreen(testContext) {
         }
     }
 
+    fun getElementByAndId(index: Int, elementId: Int) : String {
+        var actualData = ""
+        personList {
+            childAt<ListOfPerson>(index) {
+                view.interaction.check { view, _ ->
+                    val textView = view.findViewById<TextView>(elementId)
+                    actualData = textView?.text?.toString() ?: ""
+                }
+            }
+        }
+        return actualData
+    }
+
+    fun verifyStudentNameByIndex(index: Int, fullName: String) {
+        val actualName = getElementByAndId(index, R.id.person_name)
+        assertEquals(fullName, actualName)
+    }
+
+    fun verifyGenderAndAgeByIndex(index: Int, gender: String, age: String) {
+        val actualName = getElementByAndId(index, R.id.person_private_info)
+        when(gender) {
+            "М" -> assertEquals("Male, ${age}", actualName)
+            "Ж" -> assertEquals("Female, ${age}, ", actualName)
+        }
+    }
+
+    fun verifyEmaleByIndex(index: Int, emale: String) {
+        val actualData = getElementByAndId(index, R.id.person_email)
+        assertEquals(emale, actualData)
+    }
+
+    fun verifyPhoneByIndex(index: Int, phone: String) {
+        val actualData = getElementByAndId(index, R.id.person_phone)
+        assertEquals(phone, actualData)
+    }
+
+    fun verifyAddressByIndex(index: Int, address: String) {
+        val actualData = getElementByAndId(index, R.id.person_address)
+        assertEquals(address, actualData)
+    }
+
+    fun verifyScoreByIndex(index: Int, score: String) {
+        val actualData = getElementByAndId(index, R.id.person_rating)
+        assertEquals(score, actualData)
+    }
+
     fun checkStudentAmount(amount: Int) {
         personList.hasSize(amount)
     }
@@ -107,5 +156,10 @@ class MainScreen(testContext: TestContext<*>) : BaseScreen(testContext) {
 
             assertFalse("Sort student has errors", ages != descendingAges)
         }
+    }
+
+    fun checkSnackbar() {
+        snackar.isDisplayed()
+        snackar.hasText("Internet error! Check your connection")
     }
 }

@@ -18,7 +18,7 @@ import ru.tinkoff.favouritepersons.screens.MainScreen
 /**
  * @author n.miroshkin
  */
-class OpenStudentDetailsScreenTest : TestCase() {
+class EditStudentTest : TestCase()  {
 
     @get: Rule(order = 1)
     val preferenceRule = PreferenceRule()
@@ -30,13 +30,16 @@ class OpenStudentDetailsScreenTest : TestCase() {
     val activityScenarioRule = ActivityScenarioRule(MainActivity::class.java)
 
     @Test
-    fun openStudentDetailsScreen() = run {
-        val openDetailsScreen = "openDetailsScreen"
+    fun editStudentTest() = run {
+        val editStudent = "editStudent"
+        val newName = "Иосиф"
+        val fullName  = "${newName} " +
+                "${StudentData.getStudentData("responses/student_three.json").lastName}"
 
         step("Загрузка инфо первого студента") {
             WireMock.stubFor(
                 WireMock.get("/api/")
-                    .inScenario(openDetailsScreen)
+                    .inScenario(editStudent)
                     .whenScenarioStateIs(Scenario.STARTED)
                     .willSetStateTo("GetStudent")
                     .willReturn(
@@ -50,7 +53,7 @@ class OpenStudentDetailsScreenTest : TestCase() {
         step("Получение фото первого студента") {
             WireMock.stubFor(
                 WireMock.get("/api/portraits/med/women/1.jpg")
-                    .inScenario(openDetailsScreen)
+                    .inScenario(editStudent)
                     .whenScenarioStateIs("GetStudent")
                     .willSetStateTo("GetPhoto")
                     .willReturn(
@@ -71,20 +74,17 @@ class OpenStudentDetailsScreenTest : TestCase() {
         }
 
         with(DetailsScreen(this)) {
-            step("Открытие экрана с данными студента и проверка данных") {
-               verifyScreenOpened()
-               verifyFirstName(
-                   StudentData.getStudentData("responses/student_three.json").firstName
-               )
-                verifyLastName(
-                    StudentData.getStudentData("responses/student_three.json").lastName
-                )
-                verifyGender(
-                    StudentData.getStudentData("responses/student_three.json").gender
-                )
-                verifyBirthday(
-                    StudentData.getStudentData("responses/student_three.json").dobDate
-                )
+            step("Открытие экрана с данными студента с изменением полей") {
+                verifyScreenOpened()
+                inputFirstName(newName)
+                clickSubmitBtn()
+            }
+        }
+
+        with(MainScreen(this)) {
+            step("Проверка изменения имени") {
+                verifyScreenIsNotEmpty()
+                verifyStudentNameByIndex(0, fullName)
             }
         }
     }
